@@ -1,8 +1,15 @@
 package com.example.praylight.domain.entity;
 
-import javax.persistence.*;
 import com.example.praylight.application.dto.UserDto;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -22,6 +29,12 @@ public class User {
 
     @Column(length = 50, nullable = false)
     private String email;
+
+    @OneToMany(mappedBy = "authorId")
+    private List<Prayer> prayers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<PrayTogether> likes = new ArrayList<>();
 
     public static User from(UserDto dto) {
         return User.builder()

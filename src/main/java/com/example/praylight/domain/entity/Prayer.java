@@ -5,8 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-import com.example.praylight.domain.entity.common.BaseEntity;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,9 @@ public class Prayer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long authorId;
+    @ManyToOne
+    @JoinColumn(name="author_id", nullable=false)
+    private User authorId;
 
     private String content;
 
@@ -41,10 +42,13 @@ public class Prayer {
     @Column(nullable = false)
     private Boolean isVisible;
 
+    @OneToMany(mappedBy = "prayer")
+    private List<PrayTogether> likes = new ArrayList<>();
+
     public static Prayer from(PrayerDto dto) {
         return Prayer.builder()
                 .id(dto.getId())
-                .authorId(dto.getAuthorId())
+                .authorId(author)
                 .content(dto.getContent())
                 .startDate(dto.getStartDate())
                 .expiryDate(dto.getExpiryDate())
@@ -54,5 +58,5 @@ public class Prayer {
                 .build();
     }
 
-}
 
+}
