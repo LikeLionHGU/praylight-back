@@ -10,4 +10,6 @@ import java.util.List;
 public interface PrayerRoomRepository extends JpaRepository<PrayerRoom, Long> {
     PrayerRoom findByCode(String code);
     List<PrayerRoom> findByUserId(Long authorId);
+
 }
+

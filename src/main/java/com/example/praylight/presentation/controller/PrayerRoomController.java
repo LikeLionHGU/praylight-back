@@ -38,7 +38,7 @@ public class PrayerRoomController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getByUser/{userId}")
+    @GetMapping("/getByUser/{authorId}")
     public ResponseEntity<List<PrayerRoom>> getPrayerRoomsByUserId(@PathVariable Long authorId) {
         List<PrayerRoom> prayerRooms = prayerRoomService.getPrayerRoomsByUserId(authorId);
         return ResponseEntity.ok(prayerRooms);
