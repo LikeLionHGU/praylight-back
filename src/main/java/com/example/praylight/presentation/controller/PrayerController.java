@@ -44,6 +44,12 @@ public class PrayerController {
         prayerService.softDeletePrayer(prayerId);
         return ResponseEntity.ok(null);
     }
+
+//    @PatchMapping("/prayerRoom/prayer/together")
+//    public ResponseEntity<Void> togetherById(@RequestParam Long prayerId) {
+//        prayerService.togetherPrayer(prayerId);
+//        return ResponseEntity.ok(null);
+//    }
 //
 //    @PatchMapping("/prayer")
 //    public ResponseEntity<Void> changePrayer (@RequestBody PrayerDto request) {
