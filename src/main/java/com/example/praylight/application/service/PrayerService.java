@@ -1,6 +1,5 @@
 package com.example.praylight.application.service;
 
-import com.example.praylight.application.dto.PrayerDto;
 import com.example.praylight.domain.entity.Prayer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,25 @@ public class PrayerService {
         return prayerList;
     }
 
+//    @Transactional
+//    public void deletePrayer(Long prayerId){
+//        prayerRepository.deleteById(prayerId);
+//    }
+    public void softDeletePrayer(Long prayerId) {
+        Prayer prayer = prayerRepository.findById(prayerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
+        prayer.setIsDeleted(true);
+        prayerRepository.save(prayer);
+    }
+
+//    public void togetherPrayer(Long prayerId) {
+//        Prayer prayer = prayerRepository.findById(prayerId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
+//        prayer.setIsDeleted(true);
+//        prayerRepository.save(prayer);
+//    }
+
+
     @Transactional
     public Long changePrayer(PrayerDto dto){
         Prayer prayer = prayerRepository.findById(dto.getId()).orElseThrow(() -> new IllegalArgumentException("no such prayer"));
@@ -44,11 +62,5 @@ public class PrayerService {
         Prayer updatedPrayer = prayerRepository.save(prayer);
         return updatedPrayer.getId();
     }
-
-    @Transactional
-    public void toggleLike(Long prayerId, boolean liked) {
-        Prayer prayer = prayerRepository.findById(prayerId).orElseThrow(() -> new IllegalArgumentException("no such prayer"));
-        prayer.setLiked(liked);
-        prayerRepository.save(prayer);
-    }
 }
+
