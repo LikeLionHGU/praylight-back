@@ -7,5 +7,7 @@ public class CreatePrayerRoomRequest {
         return title;
     }
 
-    // Getter and Setter for title
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }
