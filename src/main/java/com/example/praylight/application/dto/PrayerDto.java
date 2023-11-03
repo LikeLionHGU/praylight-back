@@ -1,4 +1,5 @@
 package com.example.praylight.application.dto;
+import com.example.praylight.application.service.UserService;
 import com.example.praylight.domain.entity.User;
 import lombok.*;
 import com.example.praylight.domain.entity.Prayer;
@@ -20,10 +21,11 @@ public class PrayerDto {
     private Boolean isVisible;
 
 
-    public static Prayer from(PrayerDto dto) {
+    public static Prayer from(PrayerDto dto, UserService userService) {
+        User author = userService.getUserById(dto.getAuthorId());
         return Prayer.builder()
                 .id(dto.getId())
-                .authorId(dto.getAuthorId())
+                .authorId(author)
                 .content(dto.getContent())
                 .startDate(dto.getStartDate())
                 .expiryDate(dto.getExpiryDate())
@@ -32,6 +34,7 @@ public class PrayerDto {
                 .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
                 .build();
     }
+
 
 
 
