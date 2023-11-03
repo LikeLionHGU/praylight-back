@@ -42,6 +42,13 @@ public class PrayerService {
         prayerRepository.save(prayer);
     }
 
+//    public void togetherPrayer(Long prayerId) {
+//        Prayer prayer = prayerRepository.findById(prayerId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
+//        prayer.setIsDeleted(true);
+//        prayerRepository.save(prayer);
+//    }
+
 
     @Transactional
     public Long changePrayer(PrayerDto dto){
