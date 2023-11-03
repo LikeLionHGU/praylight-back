@@ -60,8 +60,8 @@ public class PrayerRoomService {
 
     @Transactional
     public List<PrayerRoom> getPrayerRoomsByUserId(Long authorId) {
-        // 사용자 ID를 기반으로 해당 사용자가 속한 기도방 목록을 검색
-        List<PrayerRoom> prayerRooms = prayerRoomRepository.findByUserId(authorId);
+        // 사용자 ID(authorId)를 기반으로 해당 사용자가 속한 기도방 목록을 검색
+        List<PrayerRoom> prayerRooms = prayerRoomRepository.findByAuthorId(authorId);
 
         if (prayerRooms.isEmpty()) {
             // 사용자가 속한 기도방이 없는 경우 예외를 던지거나 다른 방법으로 처리
@@ -70,5 +70,6 @@ public class PrayerRoomService {
 
         return prayerRooms;
     }
+
 
 }
