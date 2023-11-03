@@ -12,4 +12,5 @@ public class AddPrayerRequest {
     private String content;
     private String startDate;
     private String expiryDate;
+    private Boolean liked;  // 추가: "좋아요" 버튼 상태를 나타내는 필드
 }

@@ -24,12 +24,6 @@ public class PrayerController {
         return ResponseEntity.ok(savedId);
     }
 
-//    @GetMapping("/prayer/{prayerId}")
-//    public ResponseEntity<PrayerDto> getOnePrayer(@PathVariable Long prayerId) {
-//        Prayer prayer = prayerService.getOnePrayer(prayerId);
-//        return ResponseEntity.ok(PrayerDto.from(prayer));
-//    }
-//
     @GetMapping("/prayers")
     public ResponseEntity<List<PrayerDto>> getAllPrayers() {
         List<Prayer> prayers = prayerService.getAllPrayers();
@@ -38,22 +32,11 @@ public class PrayerController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
-//    @Transactional
-    @PatchMapping("/prayerRoom/prayer/delete")
-    public ResponseEntity<Void> deleteById(@RequestParam Long prayerId) {
-        prayerService.softDeletePrayer(prayerId);
+
+    // 추가: "좋아요" 토글 엔드포인트
+    @PatchMapping("/prayers/toggleLike/{prayerId}")
+    public ResponseEntity<Void> toggleLike(@PathVariable Long prayerId, @RequestParam Boolean liked) {
+        prayerService.toggleLike(prayerId, liked);
         return ResponseEntity.ok(null);
     }
-
-//    @PatchMapping("/prayerRoom/prayer/together")
-//    public ResponseEntity<Void> togetherById(@RequestParam Long prayerId) {
-//        prayerService.togetherPrayer(prayerId);
-//        return ResponseEntity.ok(null);
-//    }
-//
-//    @PatchMapping("/prayer")
-//    public ResponseEntity<Void> changePrayer (@RequestBody PrayerDto request) {
-//        Long updatedId = prayerService.changePrayer(request);
-//        return ResponseEntity.ok(null);
-//    }
 }

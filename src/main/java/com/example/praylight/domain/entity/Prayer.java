@@ -41,6 +41,9 @@ public class Prayer {
     @Column(nullable = false)
     private Boolean isVisible;
 
+    @Column(nullable = false)
+    private Boolean liked;  // 추가된 "좋아요" 상태를 나타내는 필드
+
     public static Prayer from(PrayerDto dto) {
         return Prayer.builder()
                 .id(dto.getId())
@@ -51,8 +54,7 @@ public class Prayer {
                 .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
                 .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
                 .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
+                .liked(false)  // 기본적으로 "좋아요"가 false로 설정
                 .build();
     }
-
 }
-
