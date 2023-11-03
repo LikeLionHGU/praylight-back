@@ -20,10 +20,10 @@ public class PrayerDto {
     private Boolean isVisible;
 
 
-    public static Prayer from(PrayerDto dto, User author) {
+    public static Prayer from(PrayerDto dto) {
         return Prayer.builder()
                 .id(dto.getId())
-                .authorId(author)
+                .authorId(dto.getAuthorId())
                 .content(dto.getContent())
                 .startDate(dto.getStartDate())
                 .expiryDate(dto.getExpiryDate())
