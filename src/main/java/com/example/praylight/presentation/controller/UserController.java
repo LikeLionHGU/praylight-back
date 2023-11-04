@@ -17,7 +17,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/prayerRoom/login")
+    @PostMapping("/signup")
     public ResponseEntity<Long> save(@RequestBody UserDto request) {
         Long savedId = userService.addUser(request);
         return ResponseEntity.ok(savedId);

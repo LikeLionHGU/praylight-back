@@ -1,6 +1,7 @@
 package com.example.praylight.application.service;
 
 import com.example.praylight.domain.entity.Prayer;
+import com.example.praylight.domain.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class PrayerService {
         return newPrayer.getId();
     }
 
+
     @Transactional
     public Prayer getOnePrayer(Long prayerId){
         Prayer prayer = prayerRepository.findById(prayerId).orElseThrow(() -> new IllegalArgumentException("no such prayer"));
@@ -35,12 +37,19 @@ public class PrayerService {
 //    public void deletePrayer(Long prayerId){
 //        prayerRepository.deleteById(prayerId);
 //    }
-    public void softDeletePrayer(Long prayerId) {
+    public void softDeletePrayer(Long prayerId, User user) {
         Prayer prayer = prayerRepository.findById(prayerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
+
+        // 게시물의 작성자가 현재 사용자인지 확인
+        if (!prayer.getAuthorId().equals(user.getId())) {
+            throw new UnauthorizedException("You are not authorized to delete this prayer.");
+        }
+
         prayer.setIsDeleted(true);
         prayerRepository.save(prayer);
     }
+
 
 //    public void togetherPrayer(Long prayerId) {
 //        Prayer prayer = prayerRepository.findById(prayerId)
