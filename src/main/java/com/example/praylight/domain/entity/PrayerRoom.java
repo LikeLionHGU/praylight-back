@@ -1,6 +1,7 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.PrayerRoomDto;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class PrayerRoom {
     private Integer light;
 
     @OneToMany(mappedBy = "prayerRoom")
+    @JsonManagedReference
     private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
     public static PrayerRoom from(PrayerRoomDto dto) {

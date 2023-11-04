@@ -5,6 +5,7 @@ import lombok.*;
 import com.example.praylight.domain.entity.Prayer;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,7 +27,7 @@ public class PrayerDto {
     public Long getPrayerRoomId() {
         return this.prayerRoomId;
     }
-
+    private List<Long> prayerRoomIds;  // 추가: 선택한 기도방의 ID 목록
 
 
 

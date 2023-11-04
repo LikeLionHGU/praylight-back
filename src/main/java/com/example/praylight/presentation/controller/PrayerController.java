@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +47,22 @@ public class PrayerController {
         List<Prayer> prayers = prayerService.getPrayersByAuthorAndDate(authorId, date);
         return ResponseEntity.ok(prayers);
     }
+    // PrayerController.java
+
+    @GetMapping("/prayerRoom/{prayerRoomId}/prayers")
+    public ResponseEntity<List<Prayer>> getAllPrayersInPrayerRoom(@PathVariable Long prayerRoomId) {
+        List<Prayer> prayers = prayerService.getAllPrayersInPrayerRoom(prayerRoomId);
+        return ResponseEntity.ok(prayers);
+    }
+    @GetMapping("/prayers/prayerRoom/{prayerRoomId}/date/{date}")
+    public ResponseEntity<List<Prayer>> getPrayersByPrayerRoomAndDate(
+            @PathVariable Long prayerRoomId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        List<Prayer> prayers = prayerService.getPrayersByPrayerRoomAndDate(prayerRoomId, date.toLocalDate());
+        return ResponseEntity.ok(prayers);
+    }
+
+
 
     @PatchMapping("/prayerRoom/prayer/{id}")
     public ResponseEntity updatePrayer(@PathVariable Long id, @RequestBody PrayerDto dto) {

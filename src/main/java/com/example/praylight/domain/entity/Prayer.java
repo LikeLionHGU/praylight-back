@@ -52,47 +52,8 @@ public class Prayer {
     private List<PrayTogether> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "prayer")
+    @JsonManagedReference
     private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
-
-//    public static Prayer from(PrayerDto dto, UserService userService) {
-//        User author = userService.getUserById(dto.getAuthorId());
-//        return Prayer.builder()
-//                .id(dto.getId())
-//                .author(author)  // 'authorId' 대신 'author'를 사용
-//                .content(dto.getContent())
-//                .startDate(dto.getStartDate())
-//                .expiryDate(dto.getExpiryDate())
-//                .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
-//                .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
-//                .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
-//                .build();
-//    }
-
-    // Prayer.java
-//    public static Prayer from(PrayerDto dto, UserService userService, PrayerRoomService prayerRoomService, PrayerRoomPrayerService prayerRoomPrayerService) {
-//        User author = userService.getUserById(dto.getAuthorId());
-//        PrayerRoom prayerRoom = prayerRoomService.getPrayerRoomById(dto.getPrayerRoomId());
-//        LocalDateTime startDate = dto.getStartDate();
-//        LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate()); // 만료일을 계산합니다
-//        Prayer prayer = Prayer.builder()
-//                .id(dto.getId())
-//                .author(author)
-//                .content(dto.getContent())
-//                .startDate(startDate)
-//                .expiryDate(expiryDate)  // 계산된 만료일을 설정합니다
-//                .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
-//                .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
-//                .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
-//                .build();
-//
-//        // PrayerRoomPrayer 엔티티 생성 및 저장
-//        PrayerRoomPrayer prayerRoomPrayer = new PrayerRoomPrayer();
-//        prayerRoomPrayer.setPrayer(prayer);
-//        prayerRoomPrayer.setPrayerRoom(prayerRoom);
-//        prayerRoomPrayerService.save(prayerRoomPrayer);
-//
-//        return prayer;
-//    }
 
 
     public static Prayer from(PrayerDto dto, UserService userService) {

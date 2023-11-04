@@ -1,5 +1,6 @@
 package com.example.praylight.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,10 +18,12 @@ public class PrayerRoomPrayer {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="prayer_id", nullable=false)
     private Prayer prayer;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="prayer_room_id", nullable=false)
     private PrayerRoom prayerRoom;
 
