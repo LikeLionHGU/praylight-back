@@ -1,20 +1,17 @@
 package com.example.praylight.presentation.controller;
 
-import com.example.praylight.application.dto.PrayerRoomDto;
-import com.example.praylight.application.service.PrayerRoomService;
-import com.example.praylight.domain.entity.PrayerRoom;
 import com.example.praylight.presentation.request.CreatePrayerRoomRequest;
 import com.example.praylight.presentation.response.CreatePrayerRoomResponse;
+import com.example.praylight.presentation.response.ReadPrayerRoomResponse;
+import com.example.praylight.application.service.PrayerRoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/prayer-rooms")
 public class PrayerRoomController {
-
     private final PrayerRoomService prayerRoomService;
 
     @Autowired
@@ -22,25 +19,15 @@ public class PrayerRoomController {
         this.prayerRoomService = prayerRoomService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CreatePrayerRoomResponse> createPrayerRoom(@RequestBody CreatePrayerRoomRequest request) {
-        PrayerRoomDto requestDto = new PrayerRoomDto();
-        requestDto.setTitle(request.getTitle());  // Assuming title is a field in CreatePrayerRoomRequest
-        // You can set other fields similarly based on your request structure.
-
-        CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(requestDto);
-        return ResponseEntity.ok(response);
+        CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/getByCode/{code}")
-    public ResponseEntity<CreatePrayerRoomResponse> getPrayerRoomByCode(@PathVariable String code) {
-        CreatePrayerRoomResponse response = prayerRoomService.getPrayerRoomByCode(code);
+    @GetMapping("/{code}")
+    public ResponseEntity<ReadPrayerRoomResponse> readPrayerRoom(@PathVariable String code) {
+        ReadPrayerRoomResponse response = prayerRoomService.readPrayerRoom(code);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/getByUser/{userId}")
-    public ResponseEntity<List<PrayerRoom>> getPrayerRoomsByUserId(@PathVariable Long userId) {
-        List<PrayerRoom> prayerRooms = prayerRoomService.getPrayerRoomsByUserId(userId);
-        return ResponseEntity.ok(prayerRooms);
     }
 }

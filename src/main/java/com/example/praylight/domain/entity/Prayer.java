@@ -48,7 +48,7 @@ public class Prayer {
     public static Prayer from(PrayerDto dto) {
         return Prayer.builder()
                 .id(dto.getId())
-                .authorId()
+                //.authorId()
                 .content(dto.getContent())
                 .startDate(dto.getStartDate())
                 .expiryDate(dto.getExpiryDate())
