@@ -1,5 +1,6 @@
 package com.example.praylight.application.service;
 
+import com.example.praylight.application.dto.PrayerRoomDto;
 import com.example.praylight.domain.entity.PrayerRoom;
 import com.example.praylight.domain.repository.PrayerRoomRepository;
 import com.example.praylight.presentation.request.CreatePrayerRoomRequest;
@@ -8,7 +9,9 @@ import com.example.praylight.presentation.response.ReadPrayerRoomResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PrayerRoomService {
@@ -54,4 +57,11 @@ public class PrayerRoomService {
                     .build();
         }
     }
+    public List<PrayerRoomDto> getPrayerRoomsByAuthorId(Long authorId) {
+        List<PrayerRoom> prayerRooms = prayerRoomRepository.findByAuthorId(authorId);
+        return prayerRooms.stream()
+                .map(prayerRoom -> PrayerRoomDto.from(Optional.of(prayerRoom)))
+                .collect(Collectors.toList());
+    }
+
 }
