@@ -33,65 +33,63 @@ public class PrayerController {
         return ResponseEntity.ok(savedId);
     }
 
-@GetMapping("/prayer/user/{userId}")
-public ResponseEntity<List<PrayerDto>> getAllPrayersByUser(@PathVariable Long userId) {
-    List<Prayer> prayers = prayerService.getAllPrayersByUser(userId);
-    List<PrayerDto> prayerDtos = prayers.stream()
-            .map(PrayerDto::from)
-            .collect(Collectors.toList());
-    return ResponseEntity.ok(prayerDtos);
-}
-
-@GetMapping("/prayers/author/{authorId}/date/{date}")
-public ResponseEntity<List<Prayer>> getPrayersByAuthorAndDate(
-        @PathVariable Long authorId,
-        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
-    List<Prayer> prayers = prayerService.getPrayersByAuthorAndDate(authorId, date);
-    return ResponseEntity.ok(prayers);
-}
-
-@GetMapping("/{prayerRoomId}/prayers")
-public ResponseEntity<List<Prayer>> getAllPrayersInPrayerRoom(@PathVariable Long prayerRoomId) {
-    List<Prayer> prayers = prayerService.getAllPrayersInPrayerRoom(prayerRoomId);
-    return ResponseEntity.ok(prayers);
-}
-
-@GetMapping("/prayers/prayerRoom/{prayerRoomId}/date/{date}")
-public ResponseEntity<List<Prayer>> getPrayersByPrayerRoomAndDate(
-        @PathVariable Long prayerRoomId,
-        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
-    List<Prayer> prayers = prayerService.getPrayersByPrayerRoomAndDate(prayerRoomId, date.toLocalDate());
-    return ResponseEntity.ok(prayers);
-}
-
-@PatchMapping("/prayer/{id}")
-public ResponseEntity updatePrayer(@PathVariable Long id, @RequestBody PrayerDto dto) {
-    dto.setId(id);
-    Long updatedPrayerId = prayerService.updatePrayer(dto);
-    return ResponseEntity.ok().body("Prayer updated with ID: " + updatedPrayerId);
-}
-
-@PostMapping("/prayers/{prayerId}/pray-together")
-public ResponseEntity<Void> togglePrayTogether(@PathVariable Long prayerId, @RequestParam Long userId) {
-    prayerService.togglePrayTogether(userId, prayerId);
-    return ResponseEntity.ok().build();
-}
-
-@GetMapping("/prayers/user/{userId}/pray-together")
-public ResponseEntity<List<Prayer>> getPrayersUserPrayedTogether(@PathVariable Long userId) {
-    List<Prayer> prayers = prayerService.getPrayersUserPrayedTogether(userId);
-    return ResponseEntity.ok(prayers);
-}
-
-@Transactional
-@PatchMapping("/prayer/{prayerId}/delete")
-public ResponseEntity<Void> deleteById(@PathVariable Long prayerId, @RequestParam Long userId) {
-    prayerService.softDeletePrayer(prayerId, userId);
-    return ResponseEntity.ok().build();
-}
-
-        return ResponseEntity.ok(null);
+    @GetMapping("/prayer/user/{userId}")
+    public ResponseEntity<List<PrayerDto>> getAllPrayersByUser(@PathVariable Long userId) {
+        List<Prayer> prayers = prayerService.getAllPrayersByUser(userId);
+        List<PrayerDto> prayerDtos = prayers.stream()
+                .map(PrayerDto::from)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(prayerDtos);
     }
 
+    @GetMapping("/prayers/author/{authorId}/date/{date}")
+    public ResponseEntity<List<Prayer>> getPrayersByAuthorAndDate(
+            @PathVariable Long authorId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        List<Prayer> prayers = prayerService.getPrayersByAuthorAndDate(authorId, date);
+        return ResponseEntity.ok(prayers);
+    }
 
+    @GetMapping("/{prayerRoomId}/prayers")
+    public ResponseEntity<List<Prayer>> getAllPrayersInPrayerRoom(@PathVariable Long prayerRoomId) {
+        List<Prayer> prayers = prayerService.getAllPrayersInPrayerRoom(prayerRoomId);
+        return ResponseEntity.ok(prayers);
+    }
+
+    @GetMapping("/prayers/prayerRoom/{prayerRoomId}/date/{date}")
+    public ResponseEntity<List<Prayer>> getPrayersByPrayerRoomAndDate(
+            @PathVariable Long prayerRoomId,
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        List<Prayer> prayers = prayerService.getPrayersByPrayerRoomAndDate(prayerRoomId, date.toLocalDate());
+        return ResponseEntity.ok(prayers);
+    }
+
+    @PatchMapping("/prayer/{id}")
+    public ResponseEntity updatePrayer(@PathVariable Long id, @RequestBody PrayerDto dto) {
+        dto.setId(id);
+        Long updatedPrayerId = prayerService.updatePrayer(dto);
+        return ResponseEntity.ok().body("Prayer updated with ID: " + updatedPrayerId);
+    }
+
+    @PostMapping("/prayers/{prayerId}/pray-together")
+    public ResponseEntity<Void> togglePrayTogether(@PathVariable Long prayerId, @RequestParam Long userId) {
+        prayerService.togglePrayTogether(userId, prayerId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/prayers/user/{userId}/pray-together")
+    public ResponseEntity<List<Prayer>> getPrayersUserPrayedTogether(@PathVariable Long userId) {
+        List<Prayer> prayers = prayerService.getPrayersUserPrayedTogether(userId);
+        return ResponseEntity.ok(prayers);
+    }
+
+    @Transactional
+    @PatchMapping("/prayer/{prayerId}/delete")
+    public ResponseEntity<Void> deleteById(@PathVariable Long prayerId, @RequestParam Long userId) {
+        prayerService.softDeletePrayer(prayerId, userId);
+        return ResponseEntity.ok().build();
+    }
 }
+
+
+

@@ -38,7 +38,7 @@ public class PrayerService {
     @Transactional
     public List<Prayer> getAllPrayersByUser(Long userId){
         User user = userService.getUserById(userId);
-        List<Prayer> prayerList = prayerRepository.findAllByAuthor(user);
+        List<Prayer> prayerList = prayerRepository.findAllByAuthorId(user.getId());
         return prayerList.stream()
                 .filter(prayer -> !prayer.getIsDeleted() && prayer.getExpiryDate().isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
@@ -47,7 +47,7 @@ public class PrayerService {
     public List<Prayer> getPrayersByAuthorAndDate(Long authorId, LocalDateTime date) {
         LocalDateTime start = date.toLocalDate().atStartOfDay(); // 그 날의 00:00
         LocalDateTime end = start.plusDays(1).minusSeconds(1); // 그 날의 23:59:59
-        List<Prayer> prayers = prayerRepository.findByAuthor_IdAndStartDateBetween(authorId, start, end);
+        List<Prayer> prayers = prayerRepository.findByAuthorIdAndStartDateBetween(authorId, start, end);
         return prayers.stream()
                 .filter(prayer -> !prayer.getIsDeleted())
                 .collect(Collectors.toList());
@@ -142,7 +142,7 @@ public Long addPrayer(PrayerDto dto) {
     LocalDateTime startDate = LocalDateTime.now();
     LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
     Prayer newPrayer = Prayer.builder()
-            .author(author)
+            .authorId(author)
             .content(dto.getContent())
             .startDate(startDate)
             .expiryDate(expiryDate)
@@ -205,7 +205,7 @@ public void softDeletePrayer(Long prayerId, Long userId) {  // 'User' 대신 'Lo
     User user = userService.getUserById(userId);  // 'userId'로 'User' 객체를 찾음
 
     // 게시물의 작성자가 현재 사용자인지 확인
-    if (!prayer.getAuthor().getId().equals(user.getId())) {  // 'getAuthorId()' 대신 'getAuthor().getId()'를 사용
+    if (!prayer.getAuthorId().getId().equals(user.getId())) {  // 'getAuthorId()' 대신 'getAuthor().getId()'를 사용
         throw new UnauthorizedException("You are not authorized to delete this prayer.");
     }
 

@@ -28,30 +28,29 @@ public class PrayerRoomController {
         this.prayerRoomService = prayerRoomService;
     }
 
-@PostMapping("/create")
-public ResponseEntity<CreatePrayerRoomResponse> createPrayerRoom(@RequestBody CreatePrayerRoomRequest request) {
-    PrayerRoomDto requestDto = new PrayerRoomDto();
-    requestDto.setTitle(request.getTitle());
-    requestDto.setAuthorId(request.getAuthorId());
-    requestDto.setLastActivityDate(request.getLastActivityDate());
-    requestDto.setCode(request.getCode());
+    @PostMapping("/create")
+    public ResponseEntity<CreatePrayerRoomResponse> createPrayerRoom(@RequestBody CreatePrayerRoomRequest request) {
+        CreatePrayerRoomRequest requestDto = new CreatePrayerRoomRequest();
+        requestDto.setTitle(request.getTitle());
+        requestDto.setAuthorId(request.getAuthorId());
+        requestDto.setLastActivityDate(request.getLastActivityDate());
+        requestDto.setCode(request.getCode());
 
-    CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(requestDto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-}
-
-@GetMapping("/code/{code}")
-public ResponseEntity<ReadPrayerRoomResponse> readPrayerRoom(@PathVariable String code) {
-    ReadPrayerRoomResponse response = prayerRoomService.readPrayerRoom(code);
-    return ResponseEntity.ok(response);
-}
-
-@GetMapping("/user/{userId}")
-public ResponseEntity<List<PrayerRoomDto>> getPrayerRoomsByAuthorId(@PathVariable Long userId) {
-    List<PrayerRoomDto> response = prayerRoomService.getPrayerRoomsByAuthorId(userId);
-    return ResponseEntity.ok(response);
-}
-
+        CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-}
 
+    @GetMapping("/code/{code}")
+    public ResponseEntity<ReadPrayerRoomResponse> readPrayerRoom(@PathVariable String code) {
+        ReadPrayerRoomResponse response = prayerRoomService.readPrayerRoom(code);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PrayerRoomDto>> getPrayerRoomsByAuthorId(@PathVariable Long userId) {
+        List<PrayerRoomDto> response = prayerRoomService.getPrayerRoomsByAuthorId(userId);
+        return ResponseEntity.ok(response);
+    }
+
+
+}

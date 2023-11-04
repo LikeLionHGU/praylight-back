@@ -33,7 +33,7 @@ public class Prayer {
 
     private User authorId;
 
-    private User author;
+//    private User author;
 
     private String content;
 
@@ -59,23 +59,17 @@ private List<PrayTogether> likes = new ArrayList<>();
 private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
 public static Prayer from(PrayerDto dto, UserService userService) {
-    User author = userService.getUserById(dto.getAuthorId());
+    User authorId = userService.getUserById(dto.getAuthorId());
     LocalDateTime startDate = dto.getStartDate();
     LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
     return Prayer.builder()
             .id(dto.getId())
-            .author(author)
+            .authorId(authorId)
             .build();
 }
 
-                .content(dto.getContent())
-                .startDate(startDate)
-                .expiryDate(expiryDate)  // 변경: 만료일을 계산해서 넣어줍니다
-                .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
-                .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
-                .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
-                .build();
-    }
+
+
 
 
 }

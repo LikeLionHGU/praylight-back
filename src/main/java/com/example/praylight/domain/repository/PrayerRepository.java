@@ -9,12 +9,8 @@ import java.util.List;
 
 
 public interface PrayerRepository extends JpaRepository<Prayer, Long>{
-    List<Prayer> findAllByAuthor(User author);
-    List<Prayer> findByAuthor_IdAndStartDateBetween(Long authorId, LocalDateTime start, LocalDateTime end);
-
-
-
-
+    List<Prayer> findAllByAuthorId(Long authorId);
+    List<Prayer> findByAuthorIdAndStartDateBetween(Long authorId, LocalDateTime start, LocalDateTime end);
 
 }
 
