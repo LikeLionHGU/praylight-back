@@ -1,6 +1,7 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -30,14 +31,15 @@ public class User {
     @Column(length = 50, nullable = false)
     private String email;
 
-    @OneToMany(mappedBy = "authorId")
-    private List<Prayer> prayers = new ArrayList<>();
+@OneToMany(mappedBy = "authorId")
+private List<Prayer> prayers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<PrayTogether> likes = new ArrayList<>();
+@OneToMany(mappedBy = "user")
+@JsonManagedReference
+private List<PrayTogether> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
+@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
 
     public static User from(UserDto dto) {
         return User.builder()
@@ -46,4 +48,6 @@ public class User {
                 .email(dto.getEmail())
                 .build();
     }
+
 }
+

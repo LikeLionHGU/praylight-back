@@ -1,3 +1,4 @@
+
 package com.example.praylight.application.service;
 
 import com.example.praylight.application.dto.PrayerRoomDto;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Service
 public class PrayerRoomService {
     private final PrayerRoomRepository prayerRoomRepository;
@@ -31,6 +33,11 @@ public class PrayerRoomService {
         this.userPrayerRoomRepository = userPrayerRoomRepository;
     }
 
+
+    @Transactional
+    public CreatePrayerRoomResponse createPrayerRoom(PrayerRoomDto requestDto) {
+        // PrayerRoomDto를 PrayerRoom 엔티티로 변환
+        PrayerRoom prayerRoom = PrayerRoom.from(requestDto);
 
     public CreatePrayerRoomResponse createPrayerRoom(CreatePrayerRoomRequest request) {
         PrayerRoom prayerRoom = PrayerRoom.builder()
@@ -75,16 +82,30 @@ public class PrayerRoomService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void clickLight(Long userId, Long prayerRoomId) throws ChangeSetPersister.NotFoundException {
-        UserPrayerRoom userPrayerRoom = userPrayerRoomRepository.findByUserIdAndPrayerRoomId(userId, prayerRoomId);
-        if (userPrayerRoom == null) {
-            // 사용자와 기도방 사이의 관계가 없으면 새로 생성
-            User user = userService.getUserById(userId);
-            PrayerRoom prayerRoom = prayerRoomRepository.findById(prayerRoomId).orElseThrow(() -> new ChangeSetPersister.NotFoundException());
-            userPrayerRoom = UserPrayerRoom.create(user, prayerRoom);
-            userPrayerRoomRepository.save(userPrayerRoom);
-        }
+   @Transactional
+public void clickLight(Long userId, Long prayerRoomId) throws ChangeSetPersister.NotFoundException {
+    UserPrayerRoom userPrayerRoom = userPrayerRoomRepository.findByUserIdAndPrayerRoomId(userId, prayerRoomId);
+    if (userPrayerRoom == null) {
+        // 사용자와 기도방 사이의 관계가 없으면 새로 생성
+        User user = userService.getUserById(userId);
+        PrayerRoom prayerRoom = prayerRoomRepository.findById(prayerRoomId).orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+        userPrayerRoom = UserPrayerRoom.create(user, prayerRoom);
+        userPrayerRoomRepository.save(userPrayerRoom);
+    }
+}
+
+public List<PrayerRoom> getPrayerRoomsByAuthorId(Long userId) {
+    // 사용자 ID를 기반으로 해당 사용자가 속한 기도방 목록을 검색
+    List<PrayerRoom> prayerRooms = prayerRoomRepository.findByAuthorId(userId);
+
+    if (prayerRooms.isEmpty()) {
+        // 사용자가 속한 기도방이 없는 경우 예외를 던지거나 다른 방법으로 처리
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자가 속한 기도방이 없습니다.");
+    }
+
+    return prayerRooms;
+}
+
 
         if (!userPrayerRoom.getIsClicked()) {
             // 사용자가 불을 아직 클릭하지 않았으면 클릭 상태로 변경하고 light 값을 증가
@@ -92,4 +113,5 @@ public class PrayerRoomService {
             userPrayerRoom.getPrayerRoom().increaseLight();
         }
     }
+
 }

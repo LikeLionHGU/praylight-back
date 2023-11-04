@@ -1,5 +1,8 @@
 package com.example.praylight.application.service;
 
+import lombok.Getter;
+
+@Getter
 public class CreatePrayerRoomData {
     private Long PrayerRoomId;
     private String code;

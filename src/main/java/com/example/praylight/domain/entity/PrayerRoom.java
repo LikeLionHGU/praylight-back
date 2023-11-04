@@ -1,9 +1,13 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.PrayerRoomDto;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
@@ -39,8 +43,13 @@ public class PrayerRoom {
 
     private Integer light;
 
-    @OneToMany(mappedBy = "prayerRoom", cascade = CascadeType.ALL)
-    private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
+@OneToMany(mappedBy = "prayerRoom", cascade = CascadeType.ALL)
+private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
+
+@OneToMany(mappedBy = "prayerRoom")
+@JsonManagedReference
+private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
+
 
     public static PrayerRoom from(PrayerRoomDto dto) {
         return PrayerRoom.builder()
