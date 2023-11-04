@@ -2,6 +2,7 @@ package com.example.praylight.application.dto;
 import com.example.praylight.domain.entity.PrayerRoom;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -18,16 +19,21 @@ public class PrayerRoomDto {
     private Boolean isVisible;
     private Integer light;
 
-    public static PrayerRoomDto from(PrayerRoom prayerRoom) {
-        return PrayerRoomDto.builder()
-                .id(prayerRoom.getId())
-                .authorId(prayerRoom.getAuthorId())
-                .title(prayerRoom.getTitle())
-                .lastActivityDate(prayerRoom.getLastActivityDate())
-                .isDeleted(prayerRoom.getIsDeleted())
-                .code(prayerRoom.getCode())
-                .isVisible(prayerRoom.getIsVisible())
-                .light(prayerRoom.getLight())
-                .build();
+    public static PrayerRoomDto from(Optional<PrayerRoom> optionalPrayerRoom) {
+        if (optionalPrayerRoom.isPresent()) {
+            PrayerRoom prayerRoom = optionalPrayerRoom.get();
+            return PrayerRoomDto.builder()
+                    .id(prayerRoom.getId())
+                    .authorId(prayerRoom.getAuthorId())
+                    .title(prayerRoom.getTitle())
+                    .lastActivityDate(prayerRoom.getLastActivityDate())
+                    .isDeleted(prayerRoom.getIsDeleted())
+                    .code(prayerRoom.getCode())
+                    .isVisible(prayerRoom.getIsVisible())
+                    .light(prayerRoom.getLight())
+                    .build();
+        } else {
+            return null;
+        }
     }
 }

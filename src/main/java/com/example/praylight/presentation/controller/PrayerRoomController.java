@@ -7,8 +7,10 @@ import com.example.praylight.application.service.PrayerRoomService;
 import com.example.praylight.domain.entity.PrayerRoom;
 import com.example.praylight.presentation.request.CreatePrayerRoomRequest;
 import com.example.praylight.presentation.response.CreatePrayerRoomResponse;
+import com.example.praylight.presentation.response.ReadPrayerRoomResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/prayer-rooms")
 public class PrayerRoomController {
-
     private final PrayerRoomService prayerRoomService;
 
     @Autowired
@@ -27,30 +28,30 @@ public class PrayerRoomController {
         this.prayerRoomService = prayerRoomService;
     }
 
+@PostMapping("/create")
+public ResponseEntity<CreatePrayerRoomResponse> createPrayerRoom(@RequestBody CreatePrayerRoomRequest request) {
+    PrayerRoomDto requestDto = new PrayerRoomDto();
+    requestDto.setTitle(request.getTitle());
+    requestDto.setAuthorId(request.getAuthorId());
+    requestDto.setLastActivityDate(request.getLastActivityDate());
+    requestDto.setCode(request.getCode());
 
-    @PostMapping("/create")
-    public ResponseEntity<CreatePrayerRoomResponse> createPrayerRoom(@RequestBody CreatePrayerRoomRequest request) {
-        PrayerRoomDto requestDto = new PrayerRoomDto();
-        requestDto.setTitle(request.getTitle());
-        requestDto.setAuthorId(request.getAuthorId());  // requestDto -> request
-        requestDto.setLastActivityDate(request.getLastActivityDate());  // requestDto -> request
-        requestDto.setCode(request.getCode());  // requestDto -> request
+    CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(requestDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+}
 
-        CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(requestDto);
-        return ResponseEntity.ok(response);
-    }
+@GetMapping("/code/{code}")
+public ResponseEntity<ReadPrayerRoomResponse> readPrayerRoom(@PathVariable String code) {
+    ReadPrayerRoomResponse response = prayerRoomService.readPrayerRoom(code);
+    return ResponseEntity.ok(response);
+}
 
+@GetMapping("/user/{userId}")
+public ResponseEntity<List<PrayerRoomDto>> getPrayerRoomsByAuthorId(@PathVariable Long userId) {
+    List<PrayerRoomDto> response = prayerRoomService.getPrayerRoomsByAuthorId(userId);
+    return ResponseEntity.ok(response);
+}
 
-    @GetMapping("/code/{code}")
-    public ResponseEntity<CreatePrayerRoomResponse> getPrayerRoomByCode(@PathVariable String code) {
-        CreatePrayerRoomResponse response = prayerRoomService.getPrayerRoomByCode(code);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/author/{authorId}")
-    public ResponseEntity<List<PrayerRoom>> getPrayerRoomsByAuthorId(@PathVariable Long authorId) {
-        List<PrayerRoom> prayerRooms = prayerRoomService.getPrayerRoomsByAuthorId(authorId);
-        return ResponseEntity.ok(prayerRooms);
     }
 }
 

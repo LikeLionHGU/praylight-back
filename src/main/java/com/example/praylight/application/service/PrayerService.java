@@ -1,9 +1,12 @@
 package com.example.praylight.application.service;
 
 import com.example.praylight.domain.entity.*;
+import com.example.praylight.domain.entity.Prayer;
+import com.example.praylight.domain.entity.User;
 import com.example.praylight.domain.repository.PrayTogetherRepository;
 import com.example.praylight.domain.repository.PrayerRoomPrayerRepository;
 import com.example.praylight.domain.repository.PrayerRoomRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,67 +132,55 @@ public class PrayerService {
     }
 
 
+@Transactional
+public Long addPrayer(PrayerDto dto) {
+    Long authorId = dto.getAuthorId();
+    if (authorId == null) {
+        throw new IllegalArgumentException("Author ID must not be null");
+    }
+    User author = userService.getUserById(authorId);
+    LocalDateTime startDate = LocalDateTime.now();
+    LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
+    Prayer newPrayer = Prayer.builder()
+            .author(author)
+            .content(dto.getContent())
+            .startDate(startDate)
+            .expiryDate(expiryDate)
+            .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
+            .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
+            .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
+            .build();
+    newPrayer = prayerRepository.save(newPrayer);
+    Long newPrayerId = newPrayer.getId();
 
-    @Transactional
-    public Long addPrayer(PrayerDto dto) {
-        // 기존 코드는 생략했습니다.
-        Long authorId = dto.getAuthorId();
-
-        if (authorId == null) {
-            throw new IllegalArgumentException("Author ID must not be null");
-        }
-        User author = userService.getUserById(authorId);
-        LocalDateTime startDate = LocalDateTime.now(); // 작성일을 현재 일시로 설정
-        LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate()); // 만료일을 작성일로부터 사용자가 지정한 일 수만큼 더한 날짜로 설정
-        Prayer newPrayer = Prayer.builder()
-                .author(author)  // 'authorId' 대신 'author'를 사용
-                .content(dto.getContent())
-                .startDate(startDate)
-                .expiryDate(expiryDate)
-                .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
-                .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
-                .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
-                .build();
-        newPrayer = prayerRepository.save(newPrayer);
-        Long newPrayerId = newPrayer.getId();
-
-        // 선택한 기도방에 기도를 추가합니다.
-        for (Long prayerRoomId : dto.getPrayerRoomIds()) {
-            PrayerRoomPrayer prayerRoomPrayer = new PrayerRoomPrayer();
-            prayerRoomPrayer.setPrayer(newPrayer);
-            PrayerRoom prayerRoom = prayerRoomRepository.findById(prayerRoomId)
-                    .orElseThrow(() -> new IllegalArgumentException("No such prayer room"));
-            prayerRoomPrayer.setPrayerRoom(prayerRoom);
-            prayerRoomPrayerService.save(prayerRoomPrayer);
-        }
-
-        return newPrayerId;
+    for (Long prayerRoomId : dto.getPrayerRoomIds()) {
+        PrayerRoomPrayer prayerRoomPrayer = new PrayerRoomPrayer();
+        prayerRoomPrayer.setPrayer(newPrayer);
+        PrayerRoom prayerRoom = prayerRoomRepository.findById(prayerRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("No such prayer room"));
+        prayerRoomPrayer.setPrayerRoom(prayerRoom);
+        prayerRoomPrayerService.save(prayerRoomPrayer);
     }
 
-    @Transactional
-    public Long updatePrayer(PrayerDto dto) {
-        Long prayerId = dto.getId();
+    return newPrayerId;
+}
 
-        // 기도를 찾지 못한 경우 예외를 던집니다.
-        Prayer prayer = prayerRepository.findById(prayerId)
-                .orElseThrow(() -> new IllegalArgumentException("No such prayer"));
+@Transactional
+public Long updatePrayer(PrayerDto dto) {
+    Long prayerId = dto.getId();
 
-        // 기도 정보를 수정합니다.
-        prayer.setContent(dto.getContent());
-        prayer.setExpiryDate(prayer.getStartDate().plusDays(dto.getExpiryDate()));
-        // 만료일을 작성일로부터 사용자가 지정한 일 수만큼 더한 날짜로 설정
-        prayer.setIsAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false);
-        prayer.setIsDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false);
-        prayer.setIsVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false);
+    Prayer prayer = prayerRepository.findById(prayerId)
+            .orElseThrow(() -> new IllegalArgumentException("No such prayer"));
 
-        // 변경된 정보를 저장하고 기도 ID를 반환합니다.
-        Prayer updatedPrayer = prayerRepository.save(prayer);
-        return updatedPrayer.getId();
-    }
+    prayer.setContent(dto.getContent());
+    prayer.setExpiryDate(prayer.getStartDate().plusDays(dto.getExpiryDate()));
+    prayer.setIsAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false);
+    prayer.setIsDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false);
+    prayer.setIsVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false);
 
-
-
-
+    Prayer updatedPrayer = prayerRepository.save(prayer);
+    return updatedPrayer.getId();
+}
 
     @Transactional
     public Prayer getOnePrayer(Long prayerId){
@@ -207,6 +198,7 @@ public class PrayerService {
 //    public void deletePrayer(Long prayerId){
 //        prayerRepository.deleteById(prayerId);
 //    }
+  
 public void softDeletePrayer(Long prayerId, Long userId) {  // 'User' 대신 'Long'을 사용
     Prayer prayer = prayerRepository.findById(prayerId)
             .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));

@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CreatePrayerRoomResponse {
+public class ReadPrayerRoomResponse {
     private Long id;
     private String code;
+    private String message;
 }

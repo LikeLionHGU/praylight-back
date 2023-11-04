@@ -31,19 +31,33 @@ public class PrayerDto {
 
 
 
-    public static PrayerDto from(Prayer prayer) {
-        Long expiryDays = ChronoUnit.DAYS.between(prayer.getStartDate(), prayer.getExpiryDate());
-        return PrayerDto.builder()
-                .id(prayer.getId())
-                .authorId(prayer.getAuthor().getId())
-                .content(prayer.getContent())
-                .startDate(prayer.getStartDate())
-                .expiryDate(expiryDays)  // 변경: 만료일 대신 만료일까지의 일 수를 넣어줍니다
-                .isAnonymous(prayer.getIsAnonymous())
-                .isDeleted(prayer.getIsDeleted())
-                .isVisible(prayer.getIsVisible())
-                .build();
-    }
+public static Prayer from(PrayerDto dto, UserService userService) {
+    User author = userService.getUserById(dto.getAuthorId());
+    return Prayer.builder()
+            .id(dto.getId())
+            .authorId(author)
+            .content(dto.getContent())
+            .startDate(dto.getStartDate())
+            .expiryDate(dto.getExpiryDate())
+            .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
+            .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
+            .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
+            .build();
+}
+
+public static PrayerDto from(Prayer prayer) {
+    Long expiryDays = ChronoUnit.DAYS.between(prayer.getStartDate(), prayer.getExpiryDate());
+    return PrayerDto.builder()
+            .id(prayer.getId())
+            .authorId(prayer.getAuthor().getId())
+            .content(prayer.getContent())
+            .startDate(prayer.getStartDate())
+            .expiryDate(expiryDays)  // 변경: 만료일 대신 만료일까지의 일 수를 넣어줍니다
+            .isAnonymous(prayer.getIsAnonymous())
+            .isDeleted(prayer.getIsDeleted())
+            .isVisible(prayer.getIsVisible())
+            .build();
+}
 
 
 }

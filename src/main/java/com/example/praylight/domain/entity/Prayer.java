@@ -30,6 +30,9 @@ public class Prayer {
 
     @ManyToOne
     @JoinColumn(name="author_id", nullable=false)
+
+    private User authorId;
+
     private User author;
 
     private String content;
@@ -48,21 +51,23 @@ public class Prayer {
     private Boolean isVisible;
 
     @OneToMany(mappedBy = "prayer")
-    @JsonManagedReference
-    private List<PrayTogether> likes = new ArrayList<>();
+@JsonManagedReference
+private List<PrayTogether> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "prayer")
-    @JsonManagedReference
-    private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
+@OneToMany(mappedBy = "prayer")
+@JsonManagedReference
+private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
+public static Prayer from(PrayerDto dto, UserService userService) {
+    User author = userService.getUserById(dto.getAuthorId());
+    LocalDateTime startDate = dto.getStartDate();
+    LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
+    return Prayer.builder()
+            .id(dto.getId())
+            .author(author)
+            .build();
+}
 
-    public static Prayer from(PrayerDto dto, UserService userService) {
-        User author = userService.getUserById(dto.getAuthorId());
-        LocalDateTime startDate = dto.getStartDate();
-        LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
-        return Prayer.builder()
-                .id(dto.getId())
-                .author(author)
                 .content(dto.getContent())
                 .startDate(startDate)
                 .expiryDate(expiryDate)  // 변경: 만료일을 계산해서 넣어줍니다
@@ -71,8 +76,6 @@ public class Prayer {
                 .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
                 .build();
     }
-
-
 
 
 }

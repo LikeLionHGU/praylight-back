@@ -3,25 +3,34 @@ package com.example.praylight.application.service;
 
 import com.example.praylight.application.dto.PrayerRoomDto;
 import com.example.praylight.domain.entity.PrayerRoom;
+import com.example.praylight.domain.entity.User;
+import com.example.praylight.domain.entity.UserPrayerRoom;
 import com.example.praylight.domain.repository.PrayerRoomRepository;
+import com.example.praylight.domain.repository.UserPrayerRoomRepository;
+import com.example.praylight.presentation.request.CreatePrayerRoomRequest;
 import com.example.praylight.presentation.response.CreatePrayerRoomResponse;
+import com.example.praylight.presentation.response.ReadPrayerRoomResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
 public class PrayerRoomService {
-
     private final PrayerRoomRepository prayerRoomRepository;
+    private final UserService userService;
+    private final UserPrayerRoomRepository userPrayerRoomRepository;
 
     @Autowired
-    public PrayerRoomService(PrayerRoomRepository prayerRoomRepository) {
+    public PrayerRoomService(PrayerRoomRepository prayerRoomRepository, UserService userService, UserPrayerRoomRepository userPrayerRoomRepository) {
         this.prayerRoomRepository = prayerRoomRepository;
+        this.userService = userService;
+        this.userPrayerRoomRepository = userPrayerRoomRepository;
     }
 
 
@@ -30,50 +39,79 @@ public class PrayerRoomService {
         // PrayerRoomDto를 PrayerRoom 엔티티로 변환
         PrayerRoom prayerRoom = PrayerRoom.from(requestDto);
 
-        // PrayerRoom 저장
+    public CreatePrayerRoomResponse createPrayerRoom(CreatePrayerRoomRequest request) {
+        PrayerRoom prayerRoom = PrayerRoom.builder()
+                .authorId(request.getAuthorId())
+                .title(request.getTitle())
+                .lastActivityDate(request.getLastActivityDate())
+                .isDeleted(request.getIsDeleted())
+                .code(request.getCode())
+                .isVisible(request.getIsVisible())
+                .light(request.getLight())
+                .build();
+
         PrayerRoom savedPrayerRoom = prayerRoomRepository.save(prayerRoom);
 
-        // 응답 데이터 생성
-        CreatePrayerRoomResponse response = new CreatePrayerRoomResponse();
-        response.setStatus("success");
-        response.setMessage("기도방이 성공적으로 생성되었습니다.");
-        response.setData(new CreatePrayerRoomData(savedPrayerRoom.getId(), savedPrayerRoom.getCode()));
-
-        return response;
+        return CreatePrayerRoomResponse.builder()
+                .id(savedPrayerRoom.getId())
+                .code(savedPrayerRoom.getCode())
+                .build();
     }
 
-    @Transactional
-    public CreatePrayerRoomResponse getPrayerRoomByCode(String roomCode) {
-        // 방 코드로 해당 방을 검색
-        PrayerRoom prayerRoom = prayerRoomRepository.findByCode(roomCode);
+    public ReadPrayerRoomResponse readPrayerRoom(String code) {
+        Optional<PrayerRoom> optionalPrayerRoom = prayerRoomRepository.findByCode(code);
 
-        if (prayerRoom == null) {
-            // 방이 없는 경우 예외를 던지거나 다른 방법으로 처리
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "방을 찾을 수 없습니다.");
+        if (optionalPrayerRoom.isPresent()) {
+            PrayerRoom prayerRoom = optionalPrayerRoom.get();
+            return ReadPrayerRoomResponse.builder()
+                    .id(prayerRoom.getId())
+                    .code(prayerRoom.getCode())
+                    .message("기도방이 존재합니다.")
+                    .build();
+        } else {
+            return ReadPrayerRoomResponse.builder()
+                    .message("해당 기도방이 존재하지 않습니다.")
+                    .build();
         }
-
-        // 방이 있는 경우 응답 데이터 생성
-        CreatePrayerRoomResponse response = new CreatePrayerRoomResponse();
-        response.setStatus("success");
-        response.setMessage("찾으시는 기도방이 있습니다.");
-        response.setData(new CreatePrayerRoomData(prayerRoom.getId(), prayerRoom.getCode()));
-
-        return response;
     }
 
-    @Transactional
-    public List<PrayerRoom> getPrayerRoomsByAuthorId(Long userId) {
-        // 사용자 ID를 기반으로 해당 사용자가 속한 기도방 목록을 검색
-        List<PrayerRoom> prayerRooms = prayerRoomRepository.findByAuthorId(userId);
+    public List<PrayerRoomDto> getPrayerRoomsByAuthorId(Long authorId) {
+        List<PrayerRoom> prayerRooms = prayerRoomRepository.findByAuthorId(authorId);
+        return prayerRooms.stream()
+                .map(prayerRoom -> PrayerRoomDto.from(Optional.of(prayerRoom)))
+                .collect(Collectors.toList());
+    }
 
-        if (prayerRooms.isEmpty()) {
-            // 사용자가 속한 기도방이 없는 경우 예외를 던지거나 다른 방법으로 처리
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자가 속한 기도방이 없습니다.");
+   @Transactional
+public void clickLight(Long userId, Long prayerRoomId) throws ChangeSetPersister.NotFoundException {
+    UserPrayerRoom userPrayerRoom = userPrayerRoomRepository.findByUserIdAndPrayerRoomId(userId, prayerRoomId);
+    if (userPrayerRoom == null) {
+        // 사용자와 기도방 사이의 관계가 없으면 새로 생성
+        User user = userService.getUserById(userId);
+        PrayerRoom prayerRoom = prayerRoomRepository.findById(prayerRoomId).orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+        userPrayerRoom = UserPrayerRoom.create(user, prayerRoom);
+        userPrayerRoomRepository.save(userPrayerRoom);
+    }
+}
+
+public List<PrayerRoom> getPrayerRoomsByAuthorId(Long userId) {
+    // 사용자 ID를 기반으로 해당 사용자가 속한 기도방 목록을 검색
+    List<PrayerRoom> prayerRooms = prayerRoomRepository.findByAuthorId(userId);
+
+    if (prayerRooms.isEmpty()) {
+        // 사용자가 속한 기도방이 없는 경우 예외를 던지거나 다른 방법으로 처리
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자가 속한 기도방이 없습니다.");
+    }
+
+    return prayerRooms;
+}
+
+
+        if (!userPrayerRoom.getIsClicked()) {
+            // 사용자가 불을 아직 클릭하지 않았으면 클릭 상태로 변경하고 light 값을 증가
+            userPrayerRoom.setIsClicked(true);
+            userPrayerRoom.getPrayerRoom().increaseLight();
         }
-
-        return prayerRooms;
     }
-
-
 
 }
