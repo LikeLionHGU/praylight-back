@@ -4,6 +4,9 @@ import com.example.praylight.application.dto.PrayerRoomDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
@@ -37,6 +40,8 @@ public class PrayerRoom {
 
     private Integer light;
 
+    @OneToMany(mappedBy = "prayerRoom")
+    private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
     public static PrayerRoom from(PrayerRoomDto dto) {
         return PrayerRoom.builder()

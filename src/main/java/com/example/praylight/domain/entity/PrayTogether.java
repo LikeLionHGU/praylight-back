@@ -1,5 +1,7 @@
 package com.example.praylight.domain.entity;
 import com.example.praylight.application.dto.UserDto;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,9 +24,11 @@ public class PrayTogether {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name="prayer_id", nullable=false)
     private Prayer prayer;
