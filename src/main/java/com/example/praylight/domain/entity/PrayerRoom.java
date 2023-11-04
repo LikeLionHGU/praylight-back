@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,6 +39,8 @@ public class PrayerRoom {
 
     private Integer light;
 
+    @OneToMany(mappedBy = "prayerRoom", cascade = CascadeType.ALL)
+    private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
 
     public static PrayerRoom from(PrayerRoomDto dto) {
         return PrayerRoom.builder()
@@ -49,5 +53,9 @@ public class PrayerRoom {
                 .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
                 .light(dto.getLight())
                 .build();
+    }
+
+    public void increaseLight() {
+        this.light += 1;
     }
 }

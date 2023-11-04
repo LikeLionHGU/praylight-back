@@ -36,6 +36,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<PrayTogether> likes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
+
     public static User from(UserDto dto) {
         return User.builder()
                 .id(dto.getId())
@@ -43,5 +46,4 @@ public class User {
                 .email(dto.getEmail())
                 .build();
     }
-
 }
