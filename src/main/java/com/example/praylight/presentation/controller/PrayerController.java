@@ -17,20 +17,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/room")
 @RequiredArgsConstructor
 public class PrayerController {
 
     private final PrayerService prayerService;
     private final UserService userService;
 
-    @PostMapping("/prayerRoom/prayer")
+    @PostMapping("/prayer")
     public ResponseEntity<Long> save(@RequestBody PrayerDto request) {
         Long savedId = prayerService.addPrayer(request);
         return ResponseEntity.ok(savedId);
     }
 
-    @GetMapping("/prayerRoom/prayer/user/{userId}")
+    @GetMapping("/prayer/user/{userId}")
     public ResponseEntity<List<PrayerDto>> getAllPrayersByUser(@PathVariable Long userId) {
         List<Prayer> prayers = prayerService.getAllPrayersByUser(userId);
         List<PrayerDto> prayerDtos = prayers.stream()
@@ -47,7 +47,7 @@ public class PrayerController {
         return ResponseEntity.ok(prayers);
     }
 
-    @PatchMapping("/prayerRoom/prayer/{id}")
+    @PatchMapping("/prayer/{id}")
     public ResponseEntity updatePrayer(@PathVariable Long id, @RequestBody PrayerDto dto) {
         dto.setId(id); // URL에서 받아온 id를 dto에 설정
         Long updatedPrayerId = prayerService.updatePrayer(dto);
@@ -63,6 +63,7 @@ public class PrayerController {
         return ResponseEntity.ok().build();
     }
 
+    //내가 함께하고 있는 모든 목록 추가
     @GetMapping("/prayers/user/{userId}/pray-together")
     public ResponseEntity<List<Prayer>> getPrayersUserPrayedTogether(@PathVariable Long userId) {
         List<Prayer> prayers = prayerService.getPrayersUserPrayedTogether(userId);

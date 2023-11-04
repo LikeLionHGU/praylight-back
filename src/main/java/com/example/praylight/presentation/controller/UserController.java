@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/signup")
+    @PostMapping("signup")
     public ResponseEntity<Long> save(@RequestBody UserDto request) {
         Long savedId = userService.addUser(request);
         return ResponseEntity.ok(savedId);
