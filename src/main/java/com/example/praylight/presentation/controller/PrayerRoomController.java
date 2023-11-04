@@ -41,13 +41,13 @@ public class PrayerRoomController {
     }
 
 
-    @GetMapping("/getByCode/{code}")
+    @GetMapping("/code/{code}")
     public ResponseEntity<CreatePrayerRoomResponse> getPrayerRoomByCode(@PathVariable String code) {
         CreatePrayerRoomResponse response = prayerRoomService.getPrayerRoomByCode(code);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getByAuthor/{authorId}")
+    @GetMapping("/author/{authorId}")
     public ResponseEntity<List<PrayerRoom>> getPrayerRoomsByAuthorId(@PathVariable Long authorId) {
         List<PrayerRoom> prayerRooms = prayerRoomService.getPrayerRoomsByAuthorId(authorId);
         return ResponseEntity.ok(prayerRooms);
