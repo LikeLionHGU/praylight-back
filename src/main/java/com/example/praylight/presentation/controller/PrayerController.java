@@ -18,20 +18,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/room")
 @RequiredArgsConstructor
 public class PrayerController {
 
     private final PrayerService prayerService;
     private final UserService userService;
 
-    @PostMapping("/prayerRoom/prayer")
+    @PostMapping("/prayer")
     public ResponseEntity<Long> save(@RequestBody PrayerDto request) {
         Long savedId = prayerService.addPrayer(request);
         return ResponseEntity.ok(savedId);
     }
 
-    @GetMapping("/prayerRoom/prayer/user/{userId}")
+    @GetMapping("/prayer/user/{userId}")
     public ResponseEntity<List<PrayerDto>> getAllPrayersByUser(@PathVariable Long userId) {
         List<Prayer> prayers = prayerService.getAllPrayersByUser(userId);
         List<PrayerDto> prayerDtos = prayers.stream()
@@ -49,7 +49,7 @@ public class PrayerController {
     }
     // PrayerController.java
 
-    @GetMapping("/prayerRoom/{prayerRoomId}/prayers")
+    @GetMapping("/{prayerRoomId}/prayers")
     public ResponseEntity<List<Prayer>> getAllPrayersInPrayerRoom(@PathVariable Long prayerRoomId) {
         List<Prayer> prayers = prayerService.getAllPrayersInPrayerRoom(prayerRoomId);
         return ResponseEntity.ok(prayers);
@@ -64,7 +64,7 @@ public class PrayerController {
 
 
 
-    @PatchMapping("/prayerRoom/prayer/{id}")
+    @PatchMapping("/prayer/{id}")
     public ResponseEntity updatePrayer(@PathVariable Long id, @RequestBody PrayerDto dto) {
         dto.setId(id); // URL에서 받아온 id를 dto에 설정
         Long updatedPrayerId = prayerService.updatePrayer(dto);
@@ -89,7 +89,7 @@ public class PrayerController {
 
     //todo 유저랑 기도방도 추가해서 넣어야 함
     @Transactional
-    @PatchMapping("/prayerRoom/prayer/{prayerId}/delete")
+    @PatchMapping("/prayer/{prayerId}/delete")
     public ResponseEntity<Void> deleteById(@PathVariable Long prayerId, @RequestParam Long userId) {
         prayerService.softDeletePrayer(prayerId, userId);
         return ResponseEntity.ok(null);
@@ -97,15 +97,4 @@ public class PrayerController {
 
 
 
-//    @PatchMapping("/prayerRoom/prayer/together")
-//    public ResponseEntity<Void> togetherById(@RequestParam Long prayerId) {
-//        prayerService.togetherPrayer(prayerId);
-//        return ResponseEntity.ok(null);
-//    }
-//
-//    @PatchMapping("/prayer")
-//    public ResponseEntity<Void> changePrayer (@RequestBody PrayerDto request) {
-//        Long updatedId = prayerService.changePrayer(request);
-//        return ResponseEntity.ok(null);
-//    }
 }
