@@ -49,12 +49,13 @@ public class PrayerController {
     }
     // PrayerController.java
 
-    @GetMapping("/{prayerRoomId}/prayers")
+    //기도방에 있는 모든 기도제목 가져오기
+    @GetMapping("/{prayerRoomId}")
     public ResponseEntity<List<Prayer>> getAllPrayersInPrayerRoom(@PathVariable Long prayerRoomId) {
         List<Prayer> prayers = prayerService.getAllPrayersInPrayerRoom(prayerRoomId);
         return ResponseEntity.ok(prayers);
     }
-    @GetMapping("/prayers/prayerRoom/{prayerRoomId}/date/{date}")
+    @GetMapping("/{prayerRoomId}/date/{date}")
     public ResponseEntity<List<Prayer>> getPrayersByPrayerRoomAndDate(
             @PathVariable Long prayerRoomId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
@@ -68,7 +69,7 @@ public class PrayerController {
     public ResponseEntity updatePrayer(@PathVariable Long id, @RequestBody PrayerDto dto) {
         dto.setId(id); // URL에서 받아온 id를 dto에 설정
         Long updatedPrayerId = prayerService.updatePrayer(dto);
-        return ResponseEntity.ok().body("Prayer updated with ID: " + updatedPrayerId);
+        return ResponseEntity.ok().body(updatedPrayerId);
     }
 
 
