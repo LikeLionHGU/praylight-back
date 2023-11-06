@@ -5,7 +5,9 @@ import com.example.praylight.application.service.PrayerRoomPrayerService;
 import com.example.praylight.application.service.PrayerRoomService;
 import com.example.praylight.application.service.UserService;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -55,7 +57,9 @@ public class Prayer {
 private List<PrayTogether> likes = new ArrayList<>();
 
 @OneToMany(mappedBy = "prayer")
-@JsonManagedReference
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
 public static Prayer from(PrayerDto dto, UserService userService) {

@@ -35,13 +35,16 @@ public class PrayerRoomService {
 
     @Transactional
     public CreatePrayerRoomResponse createPrayerRoom(CreatePrayerRoomRequest request) {
+        Boolean isDeleted = Optional.ofNullable(request.getIsDeleted()).orElse(false);
+        Boolean isVisible = Optional.ofNullable(request.getIsDeleted()).orElse(false);
+
         PrayerRoom prayerRoom = PrayerRoom.builder()
                 .authorId(request.getAuthorId())
                 .title(request.getTitle())
                 .lastActivityDate(request.getLastActivityDate())
-                .isDeleted(request.getIsDeleted())
+                .isDeleted(isDeleted)
                 .code(request.getCode())
-                .isVisible(request.getIsVisible())
+                .isVisible(isVisible)
                 .light(request.getLight())
                 .build();
 

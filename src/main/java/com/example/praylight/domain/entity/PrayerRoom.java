@@ -1,7 +1,9 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.PrayerRoomDto;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE prayer_room SET deleted = true WHERE id = ?")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class PrayerRoom {
 
     @Id

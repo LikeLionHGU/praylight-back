@@ -24,9 +24,9 @@ public class PrayTogether {
     private Long id;
 
     @ManyToOne
-@JsonBackReference
-@JoinColumn(name="user_id", nullable=false)
-private User user;
+    @JsonBackReference
+    @JoinColumn(name="user_id", nullable=false)
+    private User user;
 
     @ManyToOne
     @JoinColumn(name="prayer_id", nullable=false)
