@@ -11,7 +11,7 @@ import java.util.Optional;
 @Builder
 public class PrayerRoomDto {
     private Long id;
-    private Long authorId;
+    private Long author;
     private String title;
     private LocalDateTime lastActivityDate;
     private Boolean isDeleted;
@@ -24,7 +24,7 @@ public class PrayerRoomDto {
             PrayerRoom prayerRoom = optionalPrayerRoom.get();
             return PrayerRoomDto.builder()
                     .id(prayerRoom.getId())
-                    .authorId(prayerRoom.getAuthorId())
+                    .author(prayerRoom.getAuthor().getId())
                     .title(prayerRoom.getTitle())
                     .lastActivityDate(prayerRoom.getLastActivityDate())
                     .isDeleted(prayerRoom.getIsDeleted())

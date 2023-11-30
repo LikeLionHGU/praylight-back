@@ -1,16 +1,15 @@
 package com.example.praylight.domain.repository;
+import com.example.praylight.domain.entity.Member;
 import com.example.praylight.domain.entity.Prayer;
-import com.example.praylight.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 
 public interface PrayerRepository extends JpaRepository<Prayer, Long>{
-    List<Prayer> findAllByAuthorId(Long authorId);
-    List<Prayer> findByAuthorIdAndStartDateBetween(Long authorId, LocalDateTime start, LocalDateTime end);
+    List<Prayer> findAllByAuthor(Member author);
+    List<Prayer> findByAuthorAndStartDateBetween(Member author, LocalDateTime start, LocalDateTime end);
 
 }
 

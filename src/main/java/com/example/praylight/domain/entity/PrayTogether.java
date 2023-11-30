@@ -1,15 +1,7 @@
 package com.example.praylight.domain.entity;
-import com.example.praylight.application.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import javax.persistence.*;
 @Entity
 @Getter
@@ -25,10 +17,11 @@ public class PrayTogether {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name="user_id", nullable=false)
-    private User user;
+    @JoinColumn(name="member_id", nullable=false)
+    private Member member;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name="prayer_id", nullable=false)
     private Prayer prayer;
 

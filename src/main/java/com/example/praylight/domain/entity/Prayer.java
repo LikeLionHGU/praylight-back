@@ -1,10 +1,7 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.PrayerDto;
-import com.example.praylight.application.service.PrayerRoomPrayerService;
-import com.example.praylight.application.service.PrayerRoomService;
-import com.example.praylight.application.service.UserService;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.praylight.application.service.MemberService;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -31,9 +28,8 @@ public class Prayer {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="author_id", nullable=false)
-
-    private User authorId;
+    @JoinColumn(name="author", nullable=false)
+    private Member author;
 
 //    private User author;
 
@@ -53,27 +49,22 @@ public class Prayer {
     private Boolean isVisible;
 
     @OneToMany(mappedBy = "prayer")
-@JsonManagedReference
-private List<PrayTogether> likes = new ArrayList<>();
+    @JsonManagedReference
+    private List<PrayTogether> likes = new ArrayList<>();
 
-@OneToMany(mappedBy = "prayer")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
-private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
+    @OneToMany(mappedBy = "prayer")
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
+    private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
-public static Prayer from(PrayerDto dto, UserService userService) {
-    User authorId = userService.getUserById(dto.getAuthorId());
-    LocalDateTime startDate = dto.getStartDate();
-    LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
-    return Prayer.builder()
-            .id(dto.getId())
-            .authorId(authorId)
-            .build();
-}
-
-
-
-
-
+    public static Prayer from(PrayerDto dto, MemberService memberService) {
+        Member author = memberService.getMemberById(dto.getAuthor());
+        LocalDateTime startDate = dto.getStartDate();
+        LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
+        return Prayer.builder()
+                .id(dto.getId())
+                .author(author)
+                .build();
+    }
 }

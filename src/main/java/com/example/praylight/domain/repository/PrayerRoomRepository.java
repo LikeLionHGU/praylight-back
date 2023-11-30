@@ -11,6 +11,6 @@ public interface PrayerRoomRepository extends JpaRepository<PrayerRoom, Long> {
 
   Optional<PrayerRoom> findByCode(String code);
 
-    List<PrayerRoom> findByAuthorId(Long authorId);
+    List<PrayerRoom> findByAuthor(Long author);
 }
 

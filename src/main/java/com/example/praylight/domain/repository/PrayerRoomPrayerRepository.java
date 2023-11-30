@@ -14,6 +14,7 @@ public interface PrayerRoomPrayerRepository extends JpaRepository<PrayerRoomPray
 
     @Query("SELECT p FROM PrayerRoomPrayer p WHERE p.prayerRoom = :prayerRoom AND p.prayer.startDate BETWEEN :startOfDay AND :endOfDay AND p.prayer.isDeleted = false")
     List<PrayerRoomPrayer> findAllByPrayerRoomAndDate(@Param("prayerRoom") PrayerRoom prayerRoom, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+    PrayerRoomPrayer findByPrayerIdAndPrayerRoomId(Long prayerId, Long prayerRoomId);
 
 }
 

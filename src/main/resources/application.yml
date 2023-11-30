@@ -16,3 +16,13 @@ spring:
 logging:
   level:
     org.hibernate.sql: debug
+server:
+  port: 443
+  ssl:
+    enabled: true
+    key-store: src/main/resources/bootsecurity.p12
+    key-store-password: 111111
+    key-store-type: PKCS12
+    key-alias: bootsecurity
+google:
+  client-id: 474423125002-ihuf2cf9hpqjccdgjfuqnlcarnds4v9g.apps.googleusercontent.com

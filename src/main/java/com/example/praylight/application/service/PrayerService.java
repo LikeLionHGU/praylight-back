@@ -2,16 +2,13 @@ package com.example.praylight.application.service;
 
 import com.example.praylight.domain.entity.*;
 import com.example.praylight.domain.entity.Prayer;
-import com.example.praylight.domain.entity.User;
-import com.example.praylight.domain.repository.PrayTogetherRepository;
-import com.example.praylight.domain.repository.PrayerRoomPrayerRepository;
-import com.example.praylight.domain.repository.PrayerRoomRepository;
+import com.example.praylight.domain.entity.Member;
+import com.example.praylight.domain.repository.*;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.praylight.domain.repository.PrayerRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,32 +28,39 @@ public class PrayerService {
 
     @Autowired
     private PrayerRoomRepository prayerRoomRepository;
-
     @Autowired
-    private UserService userService;
+    private MemberRepository memberRepository;
+    @Autowired
+    private MemberService memberService;
 
     @Transactional
     public List<Prayer> getAllPrayersByUser(Long userId){
-        User user = userService.getUserById(userId);
-        List<Prayer> prayerList = prayerRepository.findAllByAuthorId(user.getId());
+        Member author = memberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
+        List<Prayer> prayerList = prayerRepository.findAllByAuthor(author);
         return prayerList.stream()
                 .filter(prayer -> !prayer.getIsDeleted() && prayer.getExpiryDate().isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
 
-    public List<Prayer> getPrayersByAuthorAndDate(Long authorId, LocalDateTime date) {
+
+
+    public List<Prayer> getPrayersByAuthorAndDate(Long userId, LocalDateTime date) {
         LocalDateTime start = date.toLocalDate().atStartOfDay(); // 그 날의 00:00
         LocalDateTime end = start.plusDays(1).minusSeconds(1); // 그 날의 23:59:59
-        List<Prayer> prayers = prayerRepository.findByAuthorIdAndStartDateBetween(authorId, start, end);
+        Member author = memberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
+
+        List<Prayer> prayers = prayerRepository.findByAuthorAndStartDateBetween(author, start, end);
         return prayers.stream()
                 .filter(prayer -> !prayer.getIsDeleted())
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<Prayer> getPrayersUserPrayedTogether(Long userId) {
-        User user = userService.getUserById(userId);
-        List<PrayTogether> prayTogethers = prayTogetherRepository.findAllByUser(user);
+    public List<Prayer> getPrayersUserPrayedTogether(Long memberId) {
+        Member member = memberService.getMemberById(memberId);
+        List<PrayTogether> prayTogethers = prayTogetherRepository.findAllByMember(member);
 
         return prayTogethers.stream()
                 .map(PrayTogether::getPrayer)
@@ -64,10 +68,10 @@ public class PrayerService {
     }
 
     @Transactional
-    public void togglePrayTogether(Long userId, Long prayerId) {
-        User user = userService.getUserById(userId);
+    public void togglePrayTogether(Long memberId, Long prayerId) {
+        Member member = memberService.getMemberById(memberId);
         Prayer prayer = getOnePrayer(prayerId);
-        PrayTogether prayTogether = prayTogetherRepository.findByUserAndPrayer(user, prayer);
+        PrayTogether prayTogether = prayTogetherRepository.findByMemberAndPrayer(member, prayer);
 
         if (prayTogether != null) {
             // 유저가 이미 이 기도를 함께하고 있다면, 함께 기도하기 정보를 삭제합니다.
@@ -75,7 +79,7 @@ public class PrayerService {
         } else {
             // 유저가 이 기도를 함께하고 있지 않다면, 함께 기도하기 정보를 추가합니다.
             prayTogether = PrayTogether.builder()
-                    .user(user)
+                    .member(member)
                     .prayer(prayer)
                     .build();
             prayTogetherRepository.save(prayTogether);
@@ -134,15 +138,15 @@ public class PrayerService {
 
 @Transactional
 public Long addPrayer(PrayerDto dto) {
-    Long authorId = dto.getAuthorId();
+    Long authorId = dto.getAuthor();
     if (authorId == null) {
         throw new IllegalArgumentException("Author ID must not be null");
     }
-    User author = userService.getUserById(authorId);
+    Member author = memberService.getMemberById(authorId);
     LocalDateTime startDate = LocalDateTime.now();
     LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
     Prayer newPrayer = Prayer.builder()
-            .authorId(author)
+            .author(author)
             .content(dto.getContent())
             .startDate(startDate)
             .expiryDate(expiryDate)
@@ -165,22 +169,30 @@ public Long addPrayer(PrayerDto dto) {
     return newPrayerId;
 }
 
-@Transactional
-public Long updatePrayer(PrayerDto dto) {
-    Long prayerId = dto.getId();
+    @Transactional
+    public Long updatePrayer(PrayerDto dto, Long userId) {
+        Long prayerId = dto.getId();
 
-    Prayer prayer = prayerRepository.findById(prayerId)
-            .orElseThrow(() -> new IllegalArgumentException("No such prayer"));
+        Prayer prayer = prayerRepository.findById(prayerId)
+                .orElseThrow(() -> new IllegalArgumentException("No such prayer"));
 
-    prayer.setContent(dto.getContent());
-    prayer.setExpiryDate(prayer.getStartDate().plusDays(dto.getExpiryDate()));
-    prayer.setIsAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false);
-    prayer.setIsDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false);
-    prayer.setIsVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false);
+        Member member = memberService.getMemberById(userId);  // 'userId'로 'User' 객체를 찾음
 
-    Prayer updatedPrayer = prayerRepository.save(prayer);
-    return updatedPrayer.getId();
-}
+        // 게시물의 작성자가 현재 사용자인지 확인
+        if (!prayer.getAuthor().getId().equals(member.getId())) {  // 'getAuthorId()' 대신 'getAuthor().getId()'를 사용
+            throw new UnauthorizedException("You are not authorized to update this prayer.");
+        }
+
+        prayer.setContent(dto.getContent());
+        prayer.setExpiryDate(prayer.getStartDate().plusDays(dto.getExpiryDate()));
+        prayer.setIsAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false);
+        prayer.setIsDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false);
+        prayer.setIsVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false);
+
+        Prayer updatedPrayer = prayerRepository.save(prayer);
+        return updatedPrayer.getId();
+    }
+
 
     @Transactional
     public Prayer getOnePrayer(Long prayerId){
@@ -202,10 +214,10 @@ public Long updatePrayer(PrayerDto dto) {
 public void softDeletePrayer(Long prayerId, Long userId) {  // 'User' 대신 'Long'을 사용
     Prayer prayer = prayerRepository.findById(prayerId)
             .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
-    User user = userService.getUserById(userId);  // 'userId'로 'User' 객체를 찾음
+    Member member = memberService.getMemberById(userId);  // 'userId'로 'User' 객체를 찾음
 
     // 게시물의 작성자가 현재 사용자인지 확인
-    if (!prayer.getAuthorId().getId().equals(user.getId())) {  // 'getAuthorId()' 대신 'getAuthor().getId()'를 사용
+    if (!prayer.getAuthor().getId().equals(member.getId())) {  // 'getAuthorId()' 대신 'getAuthor().getId()'를 사용
         throw new UnauthorizedException("You are not authorized to delete this prayer.");
     }
 

@@ -1,17 +1,14 @@
 package com.example.praylight.domain.entity;
 
-import com.example.praylight.application.dto.UserDto;
+import com.example.praylight.application.dto.MemberDto;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import javax.persistence.*;
 
 @Entity
@@ -20,15 +17,19 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "USER")
+@Table(name = "MEMBER")
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
-public class User {
+        property = "uid")
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    // Google 계정의 고유한 식별자
+    @Column(unique = true)
+    private String uid;
 
     @Column(length = 50, nullable = false)
     private String name;
@@ -36,19 +37,21 @@ public class User {
     @Column(length = 50, nullable = false)
     private String email;
 
-@OneToMany(mappedBy = "authorId")
-private List<Prayer> prayers = new ArrayList<>();
+    @OneToMany(mappedBy = "author")
+    private List<Prayer> prayers = new ArrayList<>();
 
-@OneToMany(mappedBy = "user")
-@JsonManagedReference
-private List<PrayTogether> likes = new ArrayList<>();
+    @OneToMany(mappedBy = "member")
+    @JsonManagedReference
+    private List<PrayTogether> likes = new ArrayList<>();
 
-@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberPrayerRoom> memberPrayerRooms = new ArrayList<>();
 
-    public static User from(UserDto dto) {
-        return User.builder()
+
+    public static Member from(MemberDto dto) {
+        return Member.builder()
                 .id(dto.getId())
+                .uid(dto.getUid())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .build();

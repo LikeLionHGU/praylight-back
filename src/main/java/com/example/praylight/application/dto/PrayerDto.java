@@ -1,6 +1,4 @@
 package com.example.praylight.application.dto;
-import com.example.praylight.application.service.UserService;
-import com.example.praylight.domain.entity.User;
 import lombok.*;
 import com.example.praylight.domain.entity.Prayer;
 import java.time.LocalDateTime;
@@ -14,7 +12,7 @@ import java.util.List;
 @Builder
 public class PrayerDto {
     private Long id;
-    private Long authorId;
+    private Long author;
     private String content;
     private LocalDateTime startDate;
     private Long expiryDate;
@@ -35,7 +33,7 @@ public static PrayerDto from(Prayer prayer) {
     Long expiryDays = ChronoUnit.DAYS.between(prayer.getStartDate(), prayer.getExpiryDate());
     return PrayerDto.builder()
             .id(prayer.getId())
-            .authorId(prayer.getAuthorId().getId())
+            .author(prayer.getAuthor().getId())
             .content(prayer.getContent())
             .startDate(prayer.getStartDate())
             .expiryDate(expiryDays)  // 변경: 만료일 대신 만료일까지의 일 수를 넣어줍니다

@@ -1,6 +1,7 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.PrayerRoomDto;
+import com.example.praylight.application.service.MemberService;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -11,10 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -32,7 +31,9 @@ public class PrayerRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long authorId;
+    @ManyToOne
+    @JoinColumn(name="author", nullable=false)
+    private Member author;
 
     private String title;
 
@@ -49,17 +50,18 @@ public class PrayerRoom {
     private Integer light;
 
 @OneToMany(mappedBy = "prayerRoom", cascade = CascadeType.ALL)
-private List<UserPrayerRoom> userPrayerRooms = new ArrayList<>();
+private List<MemberPrayerRoom> memberPrayerRooms = new ArrayList<>();
 
 @OneToMany(mappedBy = "prayerRoom")
 @JsonManagedReference
 private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
 
 
-    public static PrayerRoom from(PrayerRoomDto dto) {
+    public static PrayerRoom from(PrayerRoomDto dto, MemberService memberService) {
+        Member author = memberService.getMemberById(dto.getAuthor());
         return PrayerRoom.builder()
                 .id(dto.getId())
-                .authorId(dto.getAuthorId())
+                .author(author)
                 .title(dto.getTitle())
                 .lastActivityDate(dto.getLastActivityDate())
                 .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)

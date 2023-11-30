@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CreatePrayerRoomRequest {
-    private Long authorId;
+    private Long author;
     private String title;
     private LocalDateTime lastActivityDate;
     private Boolean isDeleted;
