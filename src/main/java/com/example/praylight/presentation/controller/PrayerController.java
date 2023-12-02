@@ -80,15 +80,15 @@ public class PrayerController {
         return ResponseEntity.ok(prayerDtos);
     }
 
-    @GetMapping("/prayers/author/{author}/date/{date}")
+    @GetMapping("/prayers/user/{userId}/date/{date}")
     public ResponseEntity<List<Prayer>> getPrayersByAuthorAndDate(
-            @PathVariable Long author,
+            @PathVariable Long userId,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
             @RequestHeader("Authorization") String token) {
         if(!isAuthenticated(token)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        List<Prayer> prayers = prayerService.getPrayersByAuthorAndDate(author, date);
+        List<Prayer> prayers = prayerService.getPrayersByAuthorAndDate(userId, date);
         return ResponseEntity.ok(prayers);
     }
 
@@ -121,18 +121,19 @@ public class PrayerController {
         }
         dto.setId(prayerId);
         Long updatedPrayerId = prayerService.updatePrayer(dto, userId);
-        return ResponseEntity.ok().body("Prayer updated with ID: " + updatedPrayerId);
+        return ResponseEntity.ok().body(updatedPrayerId);
     }
 
 
     @PostMapping("/prayers/{prayerId}/user/{userId}/pray-together")
-    public ResponseEntity<Void> togglePrayTogether(@PathVariable Long prayerId, @PathVariable Long userId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Boolean> togglePrayTogether(@PathVariable Long prayerId, @PathVariable Long userId, @RequestHeader("Authorization") String token) {
         if(!isAuthenticated(token)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        prayerService.togglePrayTogether(userId, prayerId);
-        return ResponseEntity.ok().build();
+        boolean isPrayTogetherCreated = prayerService.togglePrayTogether(userId, prayerId);
+        return ResponseEntity.ok(isPrayTogetherCreated);
     }
+
 
     @GetMapping("/prayers/user/{userId}/pray-together")
     public ResponseEntity<List<Prayer>> getPrayersUserPrayedTogether(@PathVariable Long userId, @RequestHeader("Authorization") String token) {
@@ -146,13 +147,14 @@ public class PrayerController {
 
     @Transactional
     @PatchMapping("/prayer/{prayerId}/user/{userId}/delete")
-    public ResponseEntity<Void> deleteById(@PathVariable Long prayerId, @PathVariable Long userId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Long> deleteById(@PathVariable Long prayerId, @PathVariable Long userId, @RequestHeader("Authorization") String token) {
         if(!isAuthenticated(token)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        prayerService.softDeletePrayer(prayerId, userId);
-        return ResponseEntity.ok().build();
+        Long deletedPrayerId = prayerService.softDeletePrayer(prayerId, userId);
+        return ResponseEntity.ok(deletedPrayerId);
     }
+
 
     @DeleteMapping("/room/{roomId}/prayer/{prayerId}/user/{userId}")
     public ResponseEntity<Void> removePrayerFromRoom(@PathVariable Long prayerId, @PathVariable Long roomId, @PathVariable Long userId, @RequestHeader("Authorization") String token) {

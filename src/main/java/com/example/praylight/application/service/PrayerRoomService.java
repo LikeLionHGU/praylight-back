@@ -54,7 +54,7 @@ public class PrayerRoomService {
     }
 
 
-    public void addMemberToPrayerRoom(String code, Long memberId) {
+    public Long addMemberToPrayerRoom(String code, Long memberId) {
         Member member = memberService.getMemberById(memberId);
         PrayerRoom prayerRoom = getPrayerRoomByCode(code);
 
@@ -66,7 +66,10 @@ public class PrayerRoomService {
 
         MemberPrayerRoom memberPrayerRoom = MemberPrayerRoom.create(member, prayerRoom);
         memberPrayerRoomRepository.save(memberPrayerRoom);
+
+        return prayerRoom.getId();
     }
+
 
 
     @Transactional

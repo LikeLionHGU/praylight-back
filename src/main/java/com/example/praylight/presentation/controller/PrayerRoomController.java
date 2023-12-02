@@ -73,14 +73,16 @@ public class PrayerRoomController {
     }
 
     @PostMapping("/user/{userId}/code/{code}")
-    public ResponseEntity<Void> enterPrayerRoom(@PathVariable Long userId,@PathVariable String code, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<Long> enterPrayerRoom(@PathVariable Long userId, @PathVariable String code, @RequestHeader("Authorization") String token) {
         // 토큰에서 사용자 ID를 추출하는 로직이 필요합니다.
         if(!isAuthenticated(token)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        prayerRoomService.addMemberToPrayerRoom(code, userId);
-        return ResponseEntity.ok().build();
+
+        Long roomId = prayerRoomService.addMemberToPrayerRoom(code, userId);
+        return ResponseEntity.ok(roomId);
     }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PrayerRoomDto>> getPrayerRoomsByMember(@PathVariable Long userId) {
         List<PrayerRoomDto> prayerRooms = prayerRoomService.getPrayerRoomsByMember(userId);
@@ -113,7 +115,7 @@ public class PrayerRoomController {
         CreatePrayerRoomResponse response = prayerRoomService.createPrayerRoom(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-    @PatchMapping("/{prayerRoomId}/user/{userId}/clickLight")
+    @PatchMapping("/{prayerRoomId}/user/{userId}/click")
     public ResponseEntity<Void> clickLight(@PathVariable Long userId, @PathVariable Long prayerRoomId, @RequestHeader("Authorization") String token) {
         if(!isAuthenticated(token)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

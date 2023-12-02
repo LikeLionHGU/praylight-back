@@ -68,7 +68,7 @@ public class PrayerService {
     }
 
     @Transactional
-    public void togglePrayTogether(Long memberId, Long prayerId) {
+    public boolean togglePrayTogether(Long memberId, Long prayerId) {
         Member member = memberService.getMemberById(memberId);
         Prayer prayer = getOnePrayer(prayerId);
         PrayTogether prayTogether = prayTogetherRepository.findByMemberAndPrayer(member, prayer);
@@ -76,6 +76,7 @@ public class PrayerService {
         if (prayTogether != null) {
             // 유저가 이미 이 기도를 함께하고 있다면, 함께 기도하기 정보를 삭제합니다.
             prayTogetherRepository.delete(prayTogether);
+            return false;
         } else {
             // 유저가 이 기도를 함께하고 있지 않다면, 함께 기도하기 정보를 추가합니다.
             prayTogether = PrayTogether.builder()
@@ -83,6 +84,7 @@ public class PrayerService {
                     .prayer(prayer)
                     .build();
             prayTogetherRepository.save(prayTogether);
+            return true;
         }
     }
 
@@ -90,7 +92,8 @@ public class PrayerService {
 
 
 
-//    @Transactional
+
+    //    @Transactional
 //    public Long addPrayer(PrayerDto dto){
 //        Long authorId = dto.getAuthorId();
 //
@@ -210,20 +213,22 @@ public Long addPrayer(PrayerDto dto) {
 //    public void deletePrayer(Long prayerId){
 //        prayerRepository.deleteById(prayerId);
 //    }
-  
-public void softDeletePrayer(Long prayerId, Long userId) {  // 'User' 대신 'Long'을 사용
-    Prayer prayer = prayerRepository.findById(prayerId)
-            .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
-    Member member = memberService.getMemberById(userId);  // 'userId'로 'User' 객체를 찾음
 
-    // 게시물의 작성자가 현재 사용자인지 확인
-    if (!prayer.getAuthor().getId().equals(member.getId())) {  // 'getAuthorId()' 대신 'getAuthor().getId()'를 사용
-        throw new UnauthorizedException("You are not authorized to delete this prayer.");
+    public Long softDeletePrayer(Long prayerId, Long userId) {
+        Prayer prayer = prayerRepository.findById(prayerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Prayer", "id", prayerId));
+        Member member = memberService.getMemberById(userId);
+
+        if (!prayer.getAuthor().getId().equals(member.getId())) {
+            throw new UnauthorizedException("You are not authorized to delete this prayer.");
+        }
+
+        prayer.setIsDeleted(true);
+        prayerRepository.save(prayer);
+
+        return prayerId;
     }
 
-    prayer.setIsDeleted(true);
-    prayerRepository.save(prayer);
-}
 
 
 //    public void togetherPrayer(Long prayerId) {
