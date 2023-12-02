@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/praylight
-    username: root
+    url: jdbc:mysql://27.96.131.19:3306/praylight?useUnicode=true&characterEncoding=UTF-8
+    username: mydb
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
@@ -16,3 +16,16 @@ spring:
 logging:
   level:
     org.hibernate.sql: debug
+
+server:
+  port: 443
+
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: ryghl782
+    key-store-type: PKCS12
+    key-alias: praylight
+
+google:
+  client-id: 474423125002-ihuf2cf9hpqjccdgjfuqnlcarnds4v9g.apps.googleusercontent.com

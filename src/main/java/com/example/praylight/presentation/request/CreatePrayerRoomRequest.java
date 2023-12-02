@@ -2,12 +2,13 @@ package com.example.praylight.presentation.request;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class CreatePrayerRoomRequest {
-    private Long authorId;
+    private Long author;
     private String title;
     private LocalDateTime lastActivityDate;
     private Boolean isDeleted;

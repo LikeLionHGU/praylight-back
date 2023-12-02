@@ -1,6 +1,10 @@
 package com.example.praylight.domain.entity;
 
 import com.example.praylight.application.dto.PrayerDto;
+import com.example.praylight.application.service.MemberService;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -24,8 +28,10 @@ public class Prayer {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="author_id", nullable=false)
-    private User authorId;
+    @JoinColumn(name="author", nullable=false)
+    private Member author;
+
+//    private User author;
 
     private String content;
 
@@ -43,20 +49,22 @@ public class Prayer {
     private Boolean isVisible;
 
     @OneToMany(mappedBy = "prayer")
+    @JsonManagedReference
     private List<PrayTogether> likes = new ArrayList<>();
 
-    public static Prayer from(PrayerDto dto) {
+    @OneToMany(mappedBy = "prayer")
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
+    private List<PrayerRoomPrayer> prayerRoomPrayers = new ArrayList<>();
+
+    public static Prayer from(PrayerDto dto, MemberService memberService) {
+        Member author = memberService.getMemberById(dto.getAuthor());
+        LocalDateTime startDate = dto.getStartDate();
+        LocalDateTime expiryDate = startDate.plusDays(dto.getExpiryDate());
         return Prayer.builder()
                 .id(dto.getId())
-                //.authorId()
-                .content(dto.getContent())
-                .startDate(dto.getStartDate())
-                .expiryDate(dto.getExpiryDate())
-                .isAnonymous(dto.getIsAnonymous() != null ? dto.getIsAnonymous() : false)
-                .isDeleted(dto.getIsDeleted() != null ? dto.getIsDeleted() : false)
-                .isVisible(dto.getIsVisible() != null ? dto.getIsVisible() : false)
+                .author(author)
                 .build();
     }
-
-
 }
